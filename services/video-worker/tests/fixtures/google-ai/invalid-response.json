@@ -1,0 +1,14 @@
+{
+  "schema_version": "behavior-analysis-v1",
+  "dog_visible": true,
+  "dogs_detected": 1,
+  "observation_quality": 1.2,
+  "body_visibility": 0.9,
+  "face_visibility": 0.5,
+  "activity": { "label": "jumping", "confidence": 0.9 },
+  "state": { "label": "certainly_anxious", "confidence": 0.9 },
+  "state_scores": {},
+  "signals": [],
+  "summary": "Invalid fixture.",
+  "limitations": []
+}

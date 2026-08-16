@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dogsense.local/contracts/worker-ingest-v1.schema.json",
+  "title": "Worker analysis ingest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "analysis_id",
+    "session_id",
+    "camera_id",
+    "captured_at",
+    "transition_seq",
+    "monitoring_status",
+    "activity",
+    "state",
+    "signals",
+    "quality",
+    "analysis",
+    "transition"
+  ],
+  "properties": {
+    "schema_version": { "const": "worker-ingest-v1" },
+    "analysis_id": { "type": "string", "format": "uuid" },
+    "session_id": { "type": "string", "format": "uuid" },
+    "camera_id": { "type": "string", "format": "uuid" },
+    "captured_at": { "type": "string", "format": "date-time" },
+    "transition_seq": { "type": "integer", "minimum": 0 },
+    "monitoring_status": { "$ref": "#/$defs/monitoringStatus" },
+    "activity": {
+      "anyOf": [
+        { "$ref": "#/$defs/activity" },
+        { "type": "null" }
+      ]
+    },
+    "state": {
+      "anyOf": [
+        { "$ref": "#/$defs/stableState" },
+        { "type": "null" }
+      ]
+    },
+    "signals": {
+      "type": "array",
+      "maxItems": 5,
+      "items": { "$ref": "#/$defs/signal" }
+    },
+    "quality": {
+      "anyOf": [
+        { "$ref": "#/$defs/quality" },
+        { "type": "null" }
+      ]
+    },
+    "analysis": {
+      "anyOf": [
+        { "$ref": "#/$defs/analysisMetadata" },
+        { "type": "null" }
+      ]
+    },
+    "transition": { "$ref": "#/$defs/transition" }
+  },
+  "$defs": {
+    "score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "activityLabel": {
+      "enum": ["sleeping", "resting", "standing", "walking", "running", "playing", "pacing", "looking_around", "unknown"]
+    },
+    "stateLabel": {
+      "enum": ["relaxed", "engaged", "alert", "stress_signals", "indeterminate"]
+    },
+    "monitoringStatus": {
+      "enum": ["starting", "analyzing", "camera_offline", "stream_unstable", "dog_not_visible", "multiple_dogs_detected", "insufficient_visibility", "service_degraded"]
+    },
+    "signalName": {
+      "enum": ["low_motion", "loose_body_posture", "repetitive_movement", "lowered_posture", "head_toward_door", "ears_back", "tail_low", "rapid_direction_changes", "play_bow", "body_stillness"]
+    },
+    "activity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "confidence"],
+      "properties": {
+        "label": { "$ref": "#/$defs/activityLabel" },
+        "confidence": { "$ref": "#/$defs/score" }
+      }
+    },
+    "stableState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "confidence", "duration_seconds", "started_at"],
+      "properties": {
+        "label": { "$ref": "#/$defs/stateLabel" },
+        "confidence": { "$ref": "#/$defs/score" },
+        "duration_seconds": { "type": "integer", "minimum": 0 },
+        "started_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "signal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "confidence"],
+      "properties": {
+        "name": { "$ref": "#/$defs/signalName" },
+        "confidence": { "$ref": "#/$defs/score" }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dog_visible", "dogs_detected", "observation_quality", "body_visibility", "face_visibility"],
+      "properties": {
+        "dog_visible": { "type": "boolean" },
+        "dogs_detected": { "type": "integer", "minimum": 0 },
+        "observation_quality": { "$ref": "#/$defs/score" },
+        "body_visibility": { "$ref": "#/$defs/score" },
+        "face_visibility": { "$ref": "#/$defs/score" }
+      }
+    },
+    "analysisMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "prompt_version", "model", "latency_ms"],
+      "properties": {
+        "schema_version": { "const": "behavior-analysis-v1" },
+        "prompt_version": { "const": "behavior-observer-v1" },
+        "model": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "latency_ms": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changed", "previous_state", "reason"],
+      "properties": {
+        "changed": { "type": "boolean" },
+        "previous_state": {
+          "anyOf": [
+            { "$ref": "#/$defs/stateLabel" },
+            { "type": "null" }
+          ]
+        },
+        "reason": {
+          "enum": ["initial", "state_changed", "unchanged", "candidate_pending", "dog_not_visible", "multiple_dogs_detected", "insufficient_visibility", "service_degraded", "camera_offline", "stream_unstable", "stopped"]
+        }
+      }
+    }
+  }
+}

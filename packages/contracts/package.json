@@ -1,0 +1,20 @@
+{
+  "name": "@dogsense/contracts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "files": [
+    "generated-types",
+    "json-schema",
+    "fixtures"
+  ],
+  "exports": {
+    ".": "./generated-types/index.ts",
+    "./behavior-analysis-v1.schema.json": "./json-schema/behavior-analysis-v1.schema.json",
+    "./worker-ingest-v1.schema.json": "./json-schema/worker-ingest-v1.schema.json",
+    "./enums-v1.json": "./json-schema/enums-v1.json"
+  }
+}

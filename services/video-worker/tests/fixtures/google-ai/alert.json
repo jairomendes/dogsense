@@ -1,0 +1,23 @@
+{
+  "schema_version": "behavior-analysis-v1",
+  "dog_visible": true,
+  "dogs_detected": 1,
+  "observation_quality": 0.9,
+  "body_visibility": 0.88,
+  "face_visibility": 0.7,
+  "activity": { "label": "looking_around", "confidence": 0.88 },
+  "state": { "label": "alert", "confidence": 0.8 },
+  "state_scores": {
+    "relaxed": 0.09,
+    "engaged": 0.18,
+    "alert": 0.8,
+    "stress_signals": 0.21,
+    "indeterminate": 0.08
+  },
+  "signals": [
+    { "name": "head_toward_door", "confidence": 0.9 },
+    { "name": "body_stillness", "confidence": 0.76 }
+  ],
+  "summary": "The dog becomes still and repeatedly turns its head toward the door.",
+  "limitations": []
+}

@@ -1,0 +1,47 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*keypair*.json
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# JavaScript / TypeScript
+node_modules/
+.next/
+.vinext/
+dist/
+coverage/
+.wrangler/
+*.tsbuildinfo
+
+# Runtime data (never commit household media or generated speech)
+data/
+artifacts/
+recordings/
+frames/
+audio-cache/
+demo/videos/*
+!demo/videos/README.md
+
+# Logs and local tooling
+*.log
+.DS_Store
+.idea/
+.vscode/
+tmp/
+

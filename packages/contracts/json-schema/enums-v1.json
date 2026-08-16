@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dogsense.local/contracts/enums-v1.json",
+  "schema_version": "enums-v1",
+  "activity": [
+    "sleeping",
+    "resting",
+    "standing",
+    "walking",
+    "running",
+    "playing",
+    "pacing",
+    "looking_around",
+    "unknown"
+  ],
+  "state": [
+    "relaxed",
+    "engaged",
+    "alert",
+    "stress_signals",
+    "indeterminate"
+  ],
+  "monitoring_status": [
+    "starting",
+    "analyzing",
+    "camera_offline",
+    "stream_unstable",
+    "dog_not_visible",
+    "multiple_dogs_detected",
+    "insufficient_visibility",
+    "service_degraded"
+  ],
+  "signal": [
+    "low_motion",
+    "loose_body_posture",
+    "repetitive_movement",
+    "lowered_posture",
+    "head_toward_door",
+    "ears_back",
+    "tail_low",
+    "rapid_direction_changes",
+    "play_bow",
+    "body_stillness"
+  ]
+}

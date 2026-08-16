@@ -1,0 +1,4 @@
+# Root entrypoint: `docker compose up --build`.
+include:
+  - infra/docker-compose.yml
+

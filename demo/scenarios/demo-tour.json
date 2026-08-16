@@ -1,0 +1,185 @@
+{
+  "loop": true,
+  "steps": [
+    {
+      "at_seconds": 0,
+      "analysis": {
+        "schema_version": "behavior-analysis-v1",
+        "dog_visible": true,
+        "dogs_detected": 1,
+        "observation_quality": 0.92,
+        "body_visibility": 0.95,
+        "face_visibility": 0.58,
+        "activity": { "label": "resting", "confidence": 0.93 },
+        "state": { "label": "relaxed", "confidence": 0.89 },
+        "state_scores": {
+          "relaxed": 0.89,
+          "engaged": 0.18,
+          "alert": 0.08,
+          "stress_signals": 0.03,
+          "indeterminate": 0.04
+        },
+        "signals": [
+          { "name": "low_motion", "confidence": 0.94 },
+          { "name": "loose_body_posture", "confidence": 0.88 }
+        ],
+        "summary": "The dog is resting with low movement and a loose body posture.",
+        "limitations": ["Face is only partly visible"]
+      }
+    },
+    {
+      "at_seconds": 10,
+      "analysis": {
+        "schema_version": "behavior-analysis-v1",
+        "dog_visible": true,
+        "dogs_detected": 1,
+        "observation_quality": 0.87,
+        "body_visibility": 0.9,
+        "face_visibility": 0.72,
+        "activity": { "label": "standing", "confidence": 0.88 },
+        "state": { "label": "alert", "confidence": 0.8 },
+        "state_scores": {
+          "relaxed": 0.12,
+          "engaged": 0.32,
+          "alert": 0.8,
+          "stress_signals": 0.16,
+          "indeterminate": 0.06
+        },
+        "signals": [
+          { "name": "body_stillness", "confidence": 0.86 },
+          { "name": "head_toward_door", "confidence": 0.82 }
+        ],
+        "summary": "The dog stands upright and looks toward the door.",
+        "limitations": []
+      }
+    },
+    {
+      "at_seconds": 22,
+      "analysis": {
+        "schema_version": "behavior-analysis-v1",
+        "dog_visible": true,
+        "dogs_detected": 1,
+        "observation_quality": 0.9,
+        "body_visibility": 0.93,
+        "face_visibility": 0.62,
+        "activity": { "label": "pacing", "confidence": 0.91 },
+        "state": { "label": "stress_signals", "confidence": 0.82 },
+        "state_scores": {
+          "relaxed": 0.04,
+          "engaged": 0.13,
+          "alert": 0.31,
+          "stress_signals": 0.82,
+          "indeterminate": 0.09
+        },
+        "signals": [
+          { "name": "repetitive_movement", "confidence": 0.93 },
+          { "name": "lowered_posture", "confidence": 0.79 },
+          { "name": "head_toward_door", "confidence": 0.74 }
+        ],
+        "summary": "The dog repeatedly walks near the door with a lowered posture.",
+        "limitations": ["No audio is analyzed"]
+      }
+    },
+    {
+      "at_seconds": 38,
+      "analysis": {
+        "schema_version": "behavior-analysis-v1",
+        "dog_visible": false,
+        "dogs_detected": 0,
+        "observation_quality": 0.22,
+        "body_visibility": 0.0,
+        "face_visibility": 0.0,
+        "activity": { "label": "unknown", "confidence": 0.0 },
+        "state": { "label": "indeterminate", "confidence": 0.94 },
+        "state_scores": {
+          "relaxed": 0.01,
+          "engaged": 0.01,
+          "alert": 0.01,
+          "stress_signals": 0.01,
+          "indeterminate": 0.94
+        },
+        "signals": [],
+        "summary": "No dog is visible in the current sequence.",
+        "limitations": ["Dog is outside the frame"]
+      }
+    },
+    {
+      "at_seconds": 50,
+      "analysis": {
+        "schema_version": "behavior-analysis-v1",
+        "dog_visible": true,
+        "dogs_detected": 1,
+        "observation_quality": 0.91,
+        "body_visibility": 0.94,
+        "face_visibility": 0.68,
+        "activity": { "label": "playing", "confidence": 0.9 },
+        "state": { "label": "engaged", "confidence": 0.86 },
+        "state_scores": {
+          "relaxed": 0.18,
+          "engaged": 0.86,
+          "alert": 0.21,
+          "stress_signals": 0.03,
+          "indeterminate": 0.03
+        },
+        "signals": [
+          { "name": "play_bow", "confidence": 0.88 },
+          { "name": "rapid_direction_changes", "confidence": 0.84 }
+        ],
+        "summary": "The dog actively interacts with a toy and shows a play bow.",
+        "limitations": []
+      }
+    },
+    {
+      "at_seconds": 64,
+      "analysis": {
+        "schema_version": "behavior-analysis-v1",
+        "dog_visible": true,
+        "dogs_detected": 1,
+        "observation_quality": 0.9,
+        "body_visibility": 0.94,
+        "face_visibility": 0.55,
+        "activity": { "label": "resting", "confidence": 0.91 },
+        "state": { "label": "relaxed", "confidence": 0.87 },
+        "state_scores": {
+          "relaxed": 0.87,
+          "engaged": 0.2,
+          "alert": 0.08,
+          "stress_signals": 0.02,
+          "indeterminate": 0.04
+        },
+        "signals": [
+          { "name": "low_motion", "confidence": 0.92 },
+          { "name": "loose_body_posture", "confidence": 0.86 }
+        ],
+        "summary": "The dog returns to resting with a loose body posture.",
+        "limitations": []
+      }
+    },
+    {
+      "at_seconds": 76,
+      "analysis": {
+        "schema_version": "behavior-analysis-v1",
+        "dog_visible": true,
+        "dogs_detected": 1,
+        "observation_quality": 0.9,
+        "body_visibility": 0.94,
+        "face_visibility": 0.55,
+        "activity": { "label": "resting", "confidence": 0.91 },
+        "state": { "label": "relaxed", "confidence": 0.87 },
+        "state_scores": {
+          "relaxed": 0.87,
+          "engaged": 0.2,
+          "alert": 0.08,
+          "stress_signals": 0.02,
+          "indeterminate": 0.04
+        },
+        "signals": [
+          { "name": "low_motion", "confidence": 0.92 },
+          { "name": "loose_body_posture", "confidence": 0.86 }
+        ],
+        "summary": "The dog remains at rest before the scenario repeats.",
+        "limitations": []
+      }
+    }
+  ]
+}

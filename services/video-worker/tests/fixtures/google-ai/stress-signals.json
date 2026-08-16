@@ -1,0 +1,24 @@
+{
+  "schema_version": "behavior-analysis-v1",
+  "dog_visible": true,
+  "dogs_detected": 1,
+  "observation_quality": 0.88,
+  "body_visibility": 0.91,
+  "face_visibility": 0.46,
+  "activity": { "label": "pacing", "confidence": 0.89 },
+  "state": { "label": "stress_signals", "confidence": 0.81 },
+  "state_scores": {
+    "relaxed": 0.05,
+    "engaged": 0.08,
+    "alert": 0.31,
+    "stress_signals": 0.81,
+    "indeterminate": 0.12
+  },
+  "signals": [
+    { "name": "repetitive_movement", "confidence": 0.92 },
+    { "name": "lowered_posture", "confidence": 0.78 },
+    { "name": "head_toward_door", "confidence": 0.74 }
+  ],
+  "summary": "The dog repeatedly walks near the door with a lowered body posture.",
+  "limitations": ["Face partially visible"]
+}

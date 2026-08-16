@@ -1,0 +1,20 @@
+{
+  "schema_version": "behavior-analysis-v1",
+  "dog_visible": true,
+  "dogs_detected": 2,
+  "observation_quality": 0.87,
+  "body_visibility": 0.75,
+  "face_visibility": 0.55,
+  "activity": { "label": "unknown", "confidence": 0.9 },
+  "state": { "label": "indeterminate", "confidence": 0.96 },
+  "state_scores": {
+    "relaxed": 0.05,
+    "engaged": 0.08,
+    "alert": 0.06,
+    "stress_signals": 0.04,
+    "indeterminate": 0.96
+  },
+  "signals": [],
+  "summary": "Two dogs are visible, so a single-dog state cannot be assigned.",
+  "limitations": ["Multiple dogs visible"]
+}

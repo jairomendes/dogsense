@@ -1,0 +1,20 @@
+{
+  "schema_version": "behavior-analysis-v1",
+  "dog_visible": true,
+  "dogs_detected": 1,
+  "observation_quality": 0.94,
+  "body_visibility": 0.96,
+  "face_visibility": 0.78,
+  "activity": { "label": "playing", "confidence": 0.9 },
+  "state": { "label": "engaged", "confidence": 0.83 },
+  "state_scores": {
+    "relaxed": 0.12,
+    "engaged": 0.83,
+    "alert": 0.18,
+    "stress_signals": 0.04,
+    "indeterminate": 0.05
+  },
+  "signals": [{ "name": "play_bow", "confidence": 0.91 }],
+  "summary": "The dog repeatedly adopts a play bow while moving toward a toy.",
+  "limitations": []
+}

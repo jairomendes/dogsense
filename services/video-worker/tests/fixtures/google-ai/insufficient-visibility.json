@@ -1,0 +1,20 @@
+{
+  "schema_version": "behavior-analysis-v1",
+  "dog_visible": true,
+  "dogs_detected": 1,
+  "observation_quality": 0.42,
+  "body_visibility": 0.31,
+  "face_visibility": 0.12,
+  "activity": { "label": "unknown", "confidence": 0.64 },
+  "state": { "label": "indeterminate", "confidence": 0.82 },
+  "state_scores": {
+    "relaxed": 0.1,
+    "engaged": 0.08,
+    "alert": 0.09,
+    "stress_signals": 0.06,
+    "indeterminate": 0.82
+  },
+  "signals": [],
+  "summary": "Only a small, partially occluded part of the dog is visible.",
+  "limitations": ["Body substantially occluded", "Low light"]
+}

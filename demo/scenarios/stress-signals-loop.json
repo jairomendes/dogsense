@@ -1,0 +1,32 @@
+{
+  "loop": true,
+  "steps": [
+    {
+      "at_seconds": 0,
+      "analysis": {
+        "schema_version": "behavior-analysis-v1",
+        "dog_visible": true,
+        "dogs_detected": 1,
+        "observation_quality": 0.9,
+        "body_visibility": 0.93,
+        "face_visibility": 0.62,
+        "activity": { "label": "pacing", "confidence": 0.91 },
+        "state": { "label": "stress_signals", "confidence": 0.82 },
+        "state_scores": {
+          "relaxed": 0.04,
+          "engaged": 0.13,
+          "alert": 0.31,
+          "stress_signals": 0.82,
+          "indeterminate": 0.09
+        },
+        "signals": [
+          { "name": "repetitive_movement", "confidence": 0.93 },
+          { "name": "lowered_posture", "confidence": 0.79 }
+        ],
+        "summary": "The dog repeatedly walks with a lowered posture.",
+        "limitations": ["No audio is analyzed"]
+      }
+    }
+  ]
+}
+

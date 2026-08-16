@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dogsense.local/contracts/behavior-analysis-v1.schema.json",
+  "title": "Behavior analysis v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "dog_visible",
+    "dogs_detected",
+    "observation_quality",
+    "body_visibility",
+    "face_visibility",
+    "activity",
+    "state",
+    "state_scores",
+    "signals",
+    "summary",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": { "const": "behavior-analysis-v1" },
+    "dog_visible": { "type": "boolean" },
+    "dogs_detected": { "type": "integer", "minimum": 0 },
+    "observation_quality": { "$ref": "#/$defs/score" },
+    "body_visibility": { "$ref": "#/$defs/score" },
+    "face_visibility": { "$ref": "#/$defs/score" },
+    "activity": { "$ref": "#/$defs/activity" },
+    "state": { "$ref": "#/$defs/state" },
+    "state_scores": { "$ref": "#/$defs/stateScores" },
+    "signals": {
+      "type": "array",
+      "maxItems": 5,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/signal" }
+    },
+    "summary": { "type": "string", "minLength": 1, "maxLength": 300 },
+    "limitations": {
+      "type": "array",
+      "maxItems": 5,
+      "items": { "type": "string", "minLength": 1, "maxLength": 120 }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "dogs_detected": { "const": 0 } },
+        "required": ["dogs_detected"]
+      },
+      "then": {
+        "properties": { "dog_visible": { "const": false } }
+      }
+    },
+    {
+      "if": {
+        "properties": { "dog_visible": { "const": true } },
+        "required": ["dog_visible"]
+      },
+      "then": {
+        "properties": { "dogs_detected": { "minimum": 1 } }
+      }
+    }
+  ],
+  "$defs": {
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "activityLabel": {
+      "enum": [
+        "sleeping",
+        "resting",
+        "standing",
+        "walking",
+        "running",
+        "playing",
+        "pacing",
+        "looking_around",
+        "unknown"
+      ]
+    },
+    "stateLabel": {
+      "enum": [
+        "relaxed",
+        "engaged",
+        "alert",
+        "stress_signals",
+        "indeterminate"
+      ]
+    },
+    "signalName": {
+      "enum": [
+        "low_motion",
+        "loose_body_posture",
+        "repetitive_movement",
+        "lowered_posture",
+        "head_toward_door",
+        "ears_back",
+        "tail_low",
+        "rapid_direction_changes",
+        "play_bow",
+        "body_stillness"
+      ]
+    },
+    "activity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "confidence"],
+      "properties": {
+        "label": { "$ref": "#/$defs/activityLabel" },
+        "confidence": { "$ref": "#/$defs/score" }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "confidence"],
+      "properties": {
+        "label": { "$ref": "#/$defs/stateLabel" },
+        "confidence": { "$ref": "#/$defs/score" }
+      }
+    },
+    "stateScores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relaxed", "engaged", "alert", "stress_signals", "indeterminate"],
+      "properties": {
+        "relaxed": { "$ref": "#/$defs/score" },
+        "engaged": { "$ref": "#/$defs/score" },
+        "alert": { "$ref": "#/$defs/score" },
+        "stress_signals": { "$ref": "#/$defs/score" },
+        "indeterminate": { "$ref": "#/$defs/score" }
+      }
+    },
+    "signal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "confidence"],
+      "properties": {
+        "name": { "$ref": "#/$defs/signalName" },
+        "confidence": { "$ref": "#/$defs/score" }
+      }
+    }
+  }
+}

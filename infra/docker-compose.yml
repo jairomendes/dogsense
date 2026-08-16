@@ -1,0 +1,264 @@
+name: dogsense
+
+x-json-logging: &json-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-service-hardening: &service-hardening
+  init: true
+  restart: unless-stopped
+  security_opt:
+    - no-new-privileges:true
+  logging: *json-logging
+
+services:
+  web:
+    <<: *service-hardening
+    build:
+      context: ../apps/web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_APP_URL: ${FRONTEND_URL:-http://localhost:3000}
+        NEXT_PUBLIC_API_URL: ${APP_BASE_URL:-http://localhost:8000}
+        NEXT_PUBLIC_VIDEO_URL: ${NEXT_PUBLIC_VIDEO_URL:-http://localhost:8889/dog-camera/whep}
+        NEXT_PUBLIC_DOG_ID: ${NEXT_PUBLIC_DOG_ID:-demo-dog}
+        NEXT_PUBLIC_LOCAL_TOKEN: ${NEXT_PUBLIC_LOCAL_TOKEN:-demo-local-token}
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      NEXT_PUBLIC_APP_URL: ${FRONTEND_URL:-http://localhost:3000}
+      NEXT_PUBLIC_API_URL: ${APP_BASE_URL:-http://localhost:8000}
+      NEXT_PUBLIC_VIDEO_URL: ${NEXT_PUBLIC_VIDEO_URL:-http://localhost:8889/dog-camera/whep}
+      NEXT_PUBLIC_DOG_ID: ${NEXT_PUBLIC_DOG_ID:-demo-dog}
+      NEXT_PUBLIC_LOCAL_TOKEN: ${NEXT_PUBLIC_LOCAL_TOKEN:-demo-local-token}
+      NEXT_PUBLIC_API_BASE_URL: ${APP_BASE_URL:-http://localhost:8000}
+      NEXT_PUBLIC_MEDIAMTX_WEBRTC_URL: ${MEDIAMTX_WEBRTC_URL:-http://localhost:8889/dog-camera/whep}
+      VITE_API_BASE_URL: ${APP_BASE_URL:-http://localhost:8000}
+      VITE_MEDIAMTX_WEBRTC_URL: ${MEDIAMTX_WEBRTC_URL:-http://localhost:8889/dog-camera/whep}
+    ports:
+      - "${DOGSENSE_BIND_HOST:-127.0.0.1}:${WEB_PORT:-3000}:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - edge
+
+  api:
+    <<: *service-hardening
+    build:
+      context: ../services/api
+      dockerfile: Dockerfile
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DOGSENSE_DEMO_MODE: ${DOGSENSE_DEMO_MODE:-true}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      RUFF_CACHE_DIR: /tmp/dogsense-ruff-cache
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+      ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+      AUTH_MODE: ${AUTH_MODE:-local}
+      LOCAL_AUTH_TOKEN: ${LOCAL_AUTH_TOKEN:-dogsense-local-demo}
+      DOGSENSE_API_TOKEN: ${DOGSENSE_API_TOKEN:-demo-local-token}
+      AUTH_REQUIRED: ${AUTH_REQUIRED:-false}
+      JWT_SECRET: ${JWT_SECRET:-dogsense-local-demo-not-for-production}
+      CREDENTIAL_ENCRYPTION_KEY: ${CREDENTIAL_ENCRYPTION_KEY:-dogsense-demo-encryption-key-change-me}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-dogsense-worker-demo-token}
+      POSTGRES_DSN: ${POSTGRES_DSN:-postgresql+asyncpg://dogsense:dogsense-local@postgres:5432/dogsense}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://dogsense:dogsense-local@postgres:5432/dogsense}
+      STORE_BACKEND: ${STORE_BACKEND:-postgres}
+      MEDIAMTX_RTSP_URL: ${MEDIAMTX_RTSP_URL:-rtsp://mediamtx:8554/dog-camera}
+      MEDIAMTX_WEBRTC_URL: ${MEDIAMTX_WEBRTC_URL:-http://localhost:8889/dog-camera/whep}
+      MEDIAMTX_API_URL: ${MEDIAMTX_API_URL:-http://mediamtx:9997}
+      MEDIAMTX_MODE: ${MEDIAMTX_MODE:-real}
+      CAMERA_ADAPTER: ${CAMERA_ADAPTER:-fake}
+      SNOWFLAKE_MODE: ${SNOWFLAKE_MODE:-fake}
+      SNOWFLAKE_ACCOUNT: ${SNOWFLAKE_ACCOUNT:-}
+      SNOWFLAKE_USER: ${SNOWFLAKE_USER:-}
+      SNOWFLAKE_DATABASE: ${SNOWFLAKE_DATABASE:-DOGSENSE}
+      SNOWFLAKE_SCHEMA: ${SNOWFLAKE_SCHEMA:-BEHAVIOR}
+      SNOWFLAKE_WAREHOUSE: ${SNOWFLAKE_WAREHOUSE:-}
+      SNOWFLAKE_ROLE: ${SNOWFLAKE_ROLE:-}
+      SNOWFLAKE_PRIVATE_KEY: ${SNOWFLAKE_PRIVATE_KEY:-}
+      SNOWFLAKE_PRIVATE_KEY_PATH: ${SNOWFLAKE_PRIVATE_KEY_PATH:-/run/secrets/snowflake-private-key}
+      SNOWFLAKE_PRIVATE_KEY_PASSPHRASE: ${SNOWFLAKE_PRIVATE_KEY_PASSPHRASE:-}
+      ANALYTICS_HMAC_KEY: ${ANALYTICS_HMAC_KEY:-dogsense-demo-analytics-key-change-me}
+      ELEVENLABS_MODE: ${ELEVENLABS_MODE:-fake}
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
+      ELEVENLABS_VOICE_ID: ${ELEVENLABS_VOICE_ID:-}
+      ELEVENLABS_MODEL_ID: ${ELEVENLABS_MODEL_ID:-}
+      SPEECH_TTL_HOURS: ${SPEECH_TTL_HOURS:-24}
+      AUDIO_TTL_SECONDS: ${AUDIO_TTL_SECONDS:-86400}
+      AUDIO_DIR: /var/lib/dogsense/audio
+      SOLANA_MODE: ${SOLANA_MODE:-fake}
+      SOLANA_RPC_URL: ${SOLANA_RPC_URL:-https://api.devnet.solana.com}
+      SOLANA_NETWORK: ${SOLANA_NETWORK:-devnet}
+      SOLANA_KEYPAIR_PATH: ${SOLANA_KEYPAIR_PATH:-/run/secrets/solana-keypair}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+    ports:
+      - "${DOGSENSE_BIND_HOST:-127.0.0.1}:${API_PORT:-8000}:8000"
+    volumes:
+      - speech_cache:/var/lib/dogsense/audio
+      - ${SNOWFLAKE_PRIVATE_KEY_HOST_PATH:-./empty-secret}:/run/secrets/snowflake-private-key:ro
+      - ${SOLANA_KEYPAIR_HOST_PATH:-./empty-secret}:/run/secrets/solana-keypair:ro
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mediamtx:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    networks:
+      - edge
+      - backend
+      - data
+
+  video-worker:
+    <<: *service-hardening
+    build:
+      context: ../services/video-worker
+      dockerfile: Dockerfile
+      additional_contexts:
+        contracts: ../packages/contracts
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DOGSENSE_DEMO_MODE: ${DOGSENSE_DEMO_MODE:-true}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      RUFF_CACHE_DIR: /tmp/dogsense-ruff-cache
+      API_BASE_URL: http://api:8000
+      DOGSENSE_API_BASE_URL: http://api:8000
+      DOGSENSE_API_URL: http://api:8000
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-dogsense-worker-demo-token}
+      DOGSENSE_INTERNAL_TOKEN: ${INTERNAL_API_TOKEN:-dogsense-worker-demo-token}
+      DOGSENSE_CAMERA_ID: ${DOGSENSE_CAMERA_ID:-00000000-0000-0000-0000-000000000001}
+      DOGSENSE_SESSION_ID: ${DOGSENSE_SESSION_ID:-00000000-0000-0000-0000-000000000003}
+      MEDIAMTX_RTSP_URL: ${MEDIAMTX_RTSP_URL:-rtsp://mediamtx:8554/dog-camera}
+      CAMERA_RTSP_URL: ${MEDIAMTX_RTSP_URL:-rtsp://mediamtx:8554/dog-camera}
+      FRAME_WINDOW_SECONDS: ${FRAME_WINDOW_SECONDS:-4}
+      FRAME_SAMPLE_FPS: ${FRAME_SAMPLE_FPS:-2}
+      ANALYSIS_INTERVAL_SECONDS: ${ANALYSIS_INTERVAL_SECONDS:-2}
+      INFERENCE_IMAGE_WIDTH: ${INFERENCE_IMAGE_WIDTH:-640}
+      INFERENCE_IMAGE_HEIGHT: ${INFERENCE_IMAGE_HEIGHT:-360}
+      INFERENCE_JPEG_QUALITY: ${INFERENCE_JPEG_QUALITY:-75}
+      MAX_QUEUED_WINDOWS: ${MAX_QUEUED_WINDOWS:-1}
+      TEMPORAL_ALPHA: ${TEMPORAL_ALPHA:-0.35}
+      STATE_CONFIDENCE_THRESHOLD: ${STATE_CONFIDENCE_THRESHOLD:-0.65}
+      DOGSENSE_AI_PROVIDER: ${DOGSENSE_AI_PROVIDER:-fake}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-}
+      GEMINI_TIMEOUT_SECONDS: ${GEMINI_TIMEOUT_SECONDS:-8}
+      PROMPT_VERSION: ${PROMPT_VERSION:-behavior-observer-v1}
+      DOGSENSE_FAKE_SCENARIO_PATH: ${DOGSENSE_FAKE_SCENARIO_PATH:-/demo/scenarios/demo-tour.json}
+    volumes:
+      - ../demo/scenarios:/demo/scenarios:ro
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    depends_on:
+      api:
+        condition: service_healthy
+      mediamtx:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8081/health/live', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    expose:
+      - "8081"
+    networks:
+      - backend
+
+  mediamtx:
+    <<: *service-hardening
+    image: bluenviron/mediamtx:1.19.3
+    environment:
+      MTX_WEBRTCADDITIONALHOSTS: ${MEDIAMTX_WEBRTC_ADDITIONAL_HOSTS:-}
+      MTX_WEBRTCALLOWORIGINS: ${FRONTEND_URL:-http://localhost:3000}
+    volumes:
+      - ./mediamtx/mediamtx.yml:/mediamtx.yml:ro
+    ports:
+      - "${DOGSENSE_BIND_HOST:-127.0.0.1}:${MEDIAMTX_RTSP_PORT:-8554}:8554"
+      - "${DOGSENSE_BIND_HOST:-127.0.0.1}:${MEDIAMTX_WEBRTC_PORT:-8889}:8889"
+      - "${DOGSENSE_BIND_HOST:-127.0.0.1}:${MEDIAMTX_WEBRTC_UDP_PORT:-8189}:8189/udp"
+    healthcheck:
+      test: ["CMD", "/mediamtx", "--version"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - edge
+      - backend
+
+  postgres:
+    image: postgres:16.4-alpine
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dogsense}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dogsense-local}
+      POSTGRES_DB: ${POSTGRES_DB:-dogsense}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+    logging: *json-logging
+    networks:
+      - data
+
+  # Synthetic video only; behavioral results remain explicitly labelled as simulated.
+  demo-camera:
+    image: bluenviron/mediamtx:1.19.3-ffmpeg
+    profiles: ["controlled-video"]
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    entrypoint: ["ffmpeg"]
+    command:
+      - -re
+      - -f
+      - lavfi
+      - -i
+      - testsrc2=size=1280x720:rate=30
+      - -c:v
+      - libx264
+      - -preset
+      - ultrafast
+      - -tune
+      - zerolatency
+      - -pix_fmt
+      - yuv420p
+      - -f
+      - rtsp
+      - -rtsp_transport
+      - tcp
+      - rtsp://mediamtx:8554/dog-camera
+    depends_on:
+      mediamtx:
+        condition: service_healthy
+    logging: *json-logging
+    networks:
+      - backend
+
+volumes:
+  postgres_data:
+  speech_cache:
+
+networks:
+  edge:
+  backend:
+  data:
+    internal: true

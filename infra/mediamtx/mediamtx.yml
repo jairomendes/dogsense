@@ -1,0 +1,35 @@
+# MediaMTX 1.19.x — no recording and no external authentication data in config.
+logLevel: info
+logDestinations: [stdout]
+readTimeout: 10s
+writeTimeout: 10s
+
+api: yes
+apiAddress: :9997
+metrics: yes
+metricsAddress: :9998
+playback: no
+
+rtsp: yes
+rtspAddress: :8554
+rtspTransports: [tcp]
+
+rtmp: no
+srt: no
+moq: no
+
+hls: no
+webrtc: yes
+webrtcAddress: :8889
+webrtcAllowOrigins:
+  - http://localhost:3000
+  - http://127.0.0.1:3000
+webrtcLocalUDPAddress: :8189
+
+pathDefaults:
+  source: publisher
+  sourceOnDemand: no
+  record: no
+
+paths:
+  dog-camera: {}

@@ -1,0 +1,42 @@
+-- Synthetic data only. Values do not correspond to a person, animal or home.
+MERGE INTO DOGSENSE.BEHAVIOR.STATE_EVENTS AS target
+USING (
+    SELECT
+        'demo-event-relaxed-001' AS EVENT_ID,
+        'demo-hmac-dog-001' AS DOG_ID_HASH,
+        'demo-hmac-camera-001' AS CAMERA_ID_HASH,
+        '2026-08-15 12:00:00 +00:00'::TIMESTAMP_TZ AS STARTED_AT,
+        '2026-08-15 12:05:00 +00:00'::TIMESTAMP_TZ AS ENDED_AT,
+        300 AS DURATION_SECONDS,
+        'resting' AS ACTIVITY,
+        'relaxed' AS STATE,
+        0.88::FLOAT AS CONFIDENCE_AVG,
+        0.92::FLOAT AS CONFIDENCE_MAX,
+        0.90::FLOAT AS OBSERVATION_QUALITY_AVG,
+        PARSE_JSON('[{"name":"low_motion","confidence":0.92}]') AS SIGNALS,
+        'behavior-observer-v1' AS PROMPT_VERSION,
+        'fake-demo' AS MODEL_NAME,
+        12 AS PROCESSING_LATENCY_MS
+) AS source
+ON target.EVENT_ID = source.EVENT_ID
+WHEN MATCHED THEN UPDATE SET
+    target.ENDED_AT = source.ENDED_AT,
+    target.DURATION_SECONDS = source.DURATION_SECONDS,
+    target.CONFIDENCE_AVG = source.CONFIDENCE_AVG,
+    target.CONFIDENCE_MAX = source.CONFIDENCE_MAX,
+    target.OBSERVATION_QUALITY_AVG = source.OBSERVATION_QUALITY_AVG,
+    target.SIGNALS = source.SIGNALS,
+    target.UPDATED_AT = CURRENT_TIMESTAMP()
+WHEN NOT MATCHED THEN INSERT (
+    EVENT_ID, DOG_ID_HASH, CAMERA_ID_HASH, STARTED_AT, ENDED_AT,
+    DURATION_SECONDS, ACTIVITY, STATE, CONFIDENCE_AVG, CONFIDENCE_MAX,
+    OBSERVATION_QUALITY_AVG, SIGNALS, PROMPT_VERSION, MODEL_NAME,
+    PROCESSING_LATENCY_MS
+) VALUES (
+    source.EVENT_ID, source.DOG_ID_HASH, source.CAMERA_ID_HASH,
+    source.STARTED_AT, source.ENDED_AT, source.DURATION_SECONDS,
+    source.ACTIVITY, source.STATE, source.CONFIDENCE_AVG,
+    source.CONFIDENCE_MAX, source.OBSERVATION_QUALITY_AVG, source.SIGNALS,
+    source.PROMPT_VERSION, source.MODEL_NAME, source.PROCESSING_LATENCY_MS
+);
+

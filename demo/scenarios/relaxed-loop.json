@@ -1,0 +1,32 @@
+{
+  "loop": true,
+  "steps": [
+    {
+      "at_seconds": 0,
+      "analysis": {
+        "schema_version": "behavior-analysis-v1",
+        "dog_visible": true,
+        "dogs_detected": 1,
+        "observation_quality": 0.92,
+        "body_visibility": 0.95,
+        "face_visibility": 0.58,
+        "activity": { "label": "resting", "confidence": 0.93 },
+        "state": { "label": "relaxed", "confidence": 0.89 },
+        "state_scores": {
+          "relaxed": 0.89,
+          "engaged": 0.18,
+          "alert": 0.08,
+          "stress_signals": 0.03,
+          "indeterminate": 0.04
+        },
+        "signals": [
+          { "name": "low_motion", "confidence": 0.94 },
+          { "name": "loose_body_posture", "confidence": 0.88 }
+        ],
+        "summary": "The dog is resting with low movement and a loose body posture.",
+        "limitations": ["Face is only partly visible"]
+      }
+    }
+  ]
+}
+
