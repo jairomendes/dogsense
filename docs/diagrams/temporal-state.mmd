@@ -1,0 +1,39 @@
+---
+title: DogSense Live — maquina de estados do motor temporal
+---
+stateDiagram-v2
+    [*] --> starting : VideoAnalysisWorker.run
+
+    starting --> analyzing : frames validos no ring buffer
+    analyzing --> camera_offline : captura falha ou stream acaba
+    analyzing --> stream_unstable : freeze atinge stream_freeze_seconds
+    analyzing --> dog_not_visible : cao ausente ou dogs_detected 0
+    analyzing --> multiple_dogs_detected : dogs_detected maior que 1
+    analyzing --> insufficient_visibility : quality ou body_visibility abaixo de 0.50
+    analyzing --> service_degraded : falha de inferencia por 10s
+    analyzing --> starting : worker.stop
+
+    camera_offline --> analyzing : reconexao com backoff
+    stream_unstable --> analyzing : frames novos e distintos
+    dog_not_visible --> analyzing : visibilidade recuperada
+    multiple_dogs_detected --> analyzing : um unico cao visivel
+    insufficient_visibility --> analyzing : qualidade suficiente
+    service_degraded --> analyzing : inferencia valida
+
+    camera_offline --> starting : worker.stop
+    stream_unstable --> starting : worker.stop
+    service_degraded --> starting : worker.stop
+
+    note right of camera_offline : fecha evento comportamental
+    note right of stream_unstable : nao fecha o evento aberto
+    note right of dog_not_visible : fecha evento apos 10s de ausencia
+
+    state analyzing {
+        [*] --> candidate_pending
+        candidate_pending --> candidate_pending : score abaixo do limiar ou margem
+        candidate_pending --> stable_state : 2 observacoes consecutivas
+        stable_state --> candidate_pending : novo candidato qualificado
+        stable_state --> stable_state : observe no evento aberto
+        note right of stable_state : relaxed, engaged, alert, stress_signals ou indeterminate
+        note right of candidate_pending : EWMA 0.35, limiar 0.65, margem 0.10
+    }

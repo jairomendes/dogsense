@@ -1,0 +1,44 @@
+---
+title: DogSense Live — pipeline do video-worker
+---
+flowchart TD
+    Start(["VideoAnalysisWorker.run()"]) --> Capture["_capture_loop()"]
+    Start --> Schedule["_schedule_loop()"]
+    Start --> Inference["_inference_loop()"]
+
+    Capture --> Source["OpenCVFrameSource.frames()"]
+    Source -->|frame JPEG em memoria| Repeat{"fingerprint e JPEG repetidos?"}
+    Repeat -->|nao| Buffer["FrameRingBuffer.append()"]
+    Repeat -->|sim por stream_freeze_seconds| Unstable["engine.stream_unstable()"]
+    Buffer -->|capacidade cheia| Drop["frames_dropped"]
+    Source -->|excecao ou stream acabou| Offline["engine.camera_offline()"]
+    Offline -->|backoff 1s a 30s| Capture
+
+    Schedule --> Latest{"ultimo frame congelado?"}
+    Latest -->|sim| Unstable
+    Latest -->|nao| Sample["TemporalSampler.select()"]
+    Sample -->|menos que min_frames| Skip["windows_insufficient"]
+    Sample -->|6 a 8 frames em 4s| Queue["LatestOnlyQueue.put_latest()"]
+    Queue -->|janela antiga descartada| DropWin["windows_dropped"]
+
+    Inference --> GetWin["windows.get()"]
+    GetWin --> Analyze["BehaviorAnalyzer.analyze()"]
+    Analyze -->|GeminiAdapter ou DeterministicFakeAdapter| Stale{"sequence invalida?"}
+    Stale -->|sim| Invalidate["invalidated_results"]
+    Stale -->|nao| Engine["TemporalStateEngine.process()"]
+    Engine -->|ANALYZING sem estado estavel| Hold["retorna None local"]
+    Engine -->|snapshot consolidado| Publish["HttpAnalysisPublisher.publish()"]
+    Analyze -->|InferenceError| Fail["engine.record_inference_failure()"]
+    Fail -->|ainda abaixo de 10s| Hold
+    Fail -->|degradation_seconds| Degraded["SERVICE_DEGRADED"]
+    Degraded --> Publish
+    Unstable --> Publish
+    Offline --> Publish
+
+    Publish --> Ingest["POST /api/v1/internal/analyses"]
+    Ingest --> Store["MemoryStore/PostgresStore.ingest()"]
+    Store -->|accepted| Hub["WebSocketHub.publish()"]
+    Hub --> Dash["Dashboard WS /api/v1/live/dogs/:dog_id"]
+    Store --> Outbox["eventos encerrados"]
+    Outbox --> Jobs["integration_worker()"]
+    Jobs --> Snow["Snowflake MERGE EVENT_ID"]

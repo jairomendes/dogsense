@@ -1,0 +1,132 @@
+---
+title: DogSense Live — modelo de dominio persistido no snapshot JSONB
+---
+erDiagram
+    DOG ||--o{ CAMERA : possui
+    DOG ||--o{ MONITORING_SESSION : inicia
+    CAMERA ||--o{ MONITORING_SESSION : alimenta
+    DOG ||--o| CURRENT_STATE : exibe
+    DOG ||--o{ STATE_EVENT : acumula
+    CAMERA ||--o{ STATE_EVENT : observa
+    MONITORING_SESSION ||--o{ STATE_EVENT : correlaciona
+    STATE_EVENT ||--o{ FEEDBACK : recebe
+    STATE_EVENT ||--o{ SPEECH_ASSET : narra
+    STATE_EVENT ||--o{ RECEIPT : assina
+    MONITORING_SESSION ||--o{ PROCESSED_ANALYSIS : deduplica
+    API_SNAPSHOT ||--|| DOG : serializa
+    SF_STATE_EVENTS }o..o| STATE_EVENT : "MERGE por EVENT_ID"
+
+    DOG {
+        string id PK
+        string name
+        string timezone
+        datetime created_at
+        datetime updated_at
+    }
+
+    CAMERA {
+        string id PK
+        string dog_id FK
+        string name
+        boolean active
+        string source_type
+        string rtsp_url_redacted
+        boolean has_credentials
+        string encrypted_credentials
+        string status
+        datetime last_checked_at
+    }
+
+    MONITORING_SESSION {
+        string id PK
+        string dog_id FK
+        string camera_id FK
+        string status
+        datetime started_at
+        datetime stopped_at
+    }
+
+    CURRENT_STATE {
+        string dog_id PK
+        string camera_id FK
+        string session_id FK
+        string monitoring_status
+        string activity_label
+        string state_label
+        float confidence
+        int sequence
+        datetime captured_at
+    }
+
+    STATE_EVENT {
+        string id PK
+        string dog_id FK
+        string camera_id FK
+        string session_id FK
+        datetime started_at
+        datetime ended_at
+        string activity
+        string state
+        float confidence_avg
+        float confidence_max
+        datetime snowflake_synced_at
+        int sample_count
+    }
+
+    FEEDBACK {
+        string id PK
+        string event_id FK
+        boolean correct
+        string corrected_state
+        string comment
+        datetime created_at
+    }
+
+    SPEECH_ASSET {
+        string id PK
+        string event_id FK
+        string language
+        string text
+        string status
+        datetime expires_at
+        string error
+    }
+
+    RECEIPT {
+        string id PK
+        string event_id FK
+        string network
+        string canonical_version
+        string event_hash
+        string memo
+        string transaction_signature
+        string status
+        string verification_status
+    }
+
+    PROCESSED_ANALYSIS {
+        uuid analysis_id PK
+        string session_id FK
+        boolean accepted
+        boolean duplicate
+        int sequence
+        string event_id
+    }
+
+    API_SNAPSHOT {
+        boolean singleton PK
+        json payload
+        datetime updated_at
+    }
+
+    SF_STATE_EVENTS {
+        string EVENT_ID PK
+        string DOG_ID_HASH
+        string CAMERA_ID_HASH
+        string STATE
+        string ACTIVITY
+        float CONFIDENCE_AVG
+        string EVENT_HASH
+        datetime STARTED_AT
+        datetime ENDED_AT
+    }

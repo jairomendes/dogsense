@@ -208,12 +208,13 @@ infra/                     Compose, MediaMTX e init PostgreSQL
 snowflake/                 migrações, views e dados sintéticos
 demo/scenarios/            respostas determinísticas versionadas
 docs/                      arquitetura, privacidade e operação
+docs/diagrams/             diagramas Mermaid gerados a partir do código
 scripts/                   bootstrap, preflight e smoke test seguros
 ```
 
 Documentação adicional:
 
-- [`docs/architecture.md`](docs/architecture.md) — componentes, redes e fluxos;
+- [`docs/architecture.md`](docs/architecture.md) — componentes, redes, fluxos e diagramas;
 - [`docs/prompt-design.md`](docs/prompt-design.md) — limites do observador visual;
 - [`docs/demo-script.md`](docs/demo-script.md) — roteiro de apresentação;
 - [`docs/runbook.md`](docs/runbook.md) — diagnóstico e recuperação;

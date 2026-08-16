@@ -1,0 +1,60 @@
+---
+title: DogSense Live — sequencia de uma atualizacao ao vivo
+---
+sequenceDiagram
+    autonumber
+    actor Tutor as Navegador
+    participant Web as Dashboard
+    participant MTX as MediaMTX
+    participant Cap as CaptureLoop
+    participant Sch as ScheduleLoop
+    participant Inf as InferenceLoop
+    participant AI as GeminiOuFake
+    participant Eng as TemporalStateEngine
+    participant API as FastAPI
+    participant Store as PostgresStore
+    participant Hub as WebSocketHub
+    participant Jobs as IntegrationWorker
+
+    Tutor->>Web: abre localhost:3000
+    Web->>MTX: WHEP POST /dog-camera/whep
+    MTX-->>Web: SDP answer e trilha WebRTC
+    Web->>API: GET /api/v1/dogs/:id/state/current
+    Web->>API: WS /api/v1/live/dogs/:id
+    API-->>Web: snapshot e recent_events
+
+    MTX->>Cap: RTSP interno dog-camera
+    Cap->>Cap: FrameRingBuffer.append(frame)
+    Sch->>Sch: buffer.recent(4s)
+    Sch->>Sch: TemporalSampler.select 2 fps
+    Sch->>Inf: LatestOnlyQueue.put_latest(window)
+
+    Inf->>AI: analyzer.analyze(window)
+    alt timeout ou payload invalido
+        AI-->>Inf: InferenceError
+        Inf->>Eng: record_inference_failure()
+        Note over Eng: apos 10s vira service_degraded
+    else resultado behavior-analysis-v1
+        AI-->>Inf: InferenceResult
+        Inf->>Eng: process(analysis)
+        Note over Eng: EWMA alpha=0.35, limiar 0.65, margem 0.10, 2 observacoes
+    end
+
+    Inf->>API: POST /api/v1/internal/analyses
+    API->>Store: ingest(AnalysisIngest)
+    alt analysis_id duplicado
+        Store-->>API: accepted=false duplicate=true
+    else transition_seq ou captured_at obsoleto
+        Store-->>API: 409 IngestConflict
+    else aceito
+        Store->>Store: current_state e evento aberto ou fechado
+        Store-->>API: IngestResponse
+        API->>Hub: live_state_updated ou monitoring_status_updated
+        Hub-->>Web: mensagem WS
+    end
+
+    opt evento encerrado e nao sincronizado
+        Jobs->>Store: list_unsynced_events()
+        Jobs->>Jobs: analytics.sync_event()
+        Jobs->>Store: mark_event_synced()
+    end

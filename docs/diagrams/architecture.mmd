@@ -1,0 +1,33 @@
+---
+title: DogSense Live — arquitetura de componentes
+---
+architecture-beta
+    group edge(internet)[rede edge]
+    group backend(server)[rede backend]
+    group data(database)[rede data interna]
+
+    service browser(internet)[Navegador]
+    service web(server)[web Nextjs] in edge
+    service api(server)[API FastAPI] in edge
+    service mtx(server)[MediaMTX] in edge
+    service worker(server)[video worker] in backend
+    service demo(server)[demo camera] in backend
+    service pg(database)[PostgreSQL] in data
+    service gemini(cloud)[Gemini ou fake]
+    service snow(database)[Snowflake ou fake]
+    service voice(internet)[ElevenLabs ou fake]
+    service sol(internet)[Solana Devnet]
+    junction ext
+
+    browser:R --> L:web
+    browser:B --> T:mtx
+    web:B --> T:api
+    demo:R --> L:mtx
+    mtx:B --> T:worker
+    worker:T --> B:api
+    worker:R --> L:gemini
+    api:B --> T:pg
+    api:R --> L:ext
+    ext:R --> L:snow
+    ext:T --> B:voice
+    ext:B --> T:sol
